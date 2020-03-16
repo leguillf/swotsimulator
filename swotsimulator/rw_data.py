@@ -48,7 +48,11 @@ def read_coordinates(ifile,  nlon, nlat, twoD=True):
     ''' General routine to read coordinates in a netcdf file. \n
     Inputs are file name, longitude name, latitude name. \n
     Outputs are longitudes and latitudes (2D arrays).'''
-
+    
+    # FlG: consider the case when grid file is declared without the .nc extension
+    if ifile[-3:]!='.nc':
+        ifile += '.nc'
+        
     # - Open Netcdf file
     try:
         fid = Dataset(ifile, 'r')
@@ -1155,7 +1159,11 @@ class NETCDF_MODEL():
         Argument is index=index to load part of the variable.'''
         for key, value in self.input_var_list.items():
             nfile0 = self.nfile
-            _nfile = '{}{}.nc'.format(nfile0, value[1])
+            # FlG: consider the case when files are written with the .nc extansion
+            if nfile0[-3:]=='.nc':
+                _nfile = nfile0
+            else:
+                _nfile = '{}{}.nc'.format(nfile0, value[1])
             if os.path.exists(_nfile):
                 self.input_var[key] = read_var(_nfile, value[0], index=index,
                                                time=self.time,

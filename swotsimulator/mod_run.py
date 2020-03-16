@@ -120,6 +120,8 @@ def load_coordinate_model(p):
         list_file = [line.strip() for line in open(p.file_input)]
     else:
         list_file = None
+        # FlG: add next line, otherwise p.file_input=None raises an error  
+        model_data = []
     # - Read model input coordinates '''
     # If a list of model files are specified, read model file coordinates
     if p.file_input is not None:
@@ -398,17 +400,23 @@ def create_SWOTlikedata(cycle, list_file, modelbox, sgrid, ngrid,
                                             lats=model_data.vlat)
                         if nadir_alone is False:
                            lon_grid = wrap_lon(lon_grid)
-                           grid_def = geomdef(lons=lon_grid, lats=sgrid.lat)
+                           # FlG
+                           #grid_def = geomdef(lons=lon_grid, lats=sgrid.lat)
+                           grid_def = geomdef(lons=lon_grid[ind_time[0], :], lats=sgrid.lat[ind_time[0], :])
                            for key in input_var.keys():
                                 _ssh = interp(swath_def, input_var[key], grid_def,
                                               max(p.delta_al, p.delta_ac),
                                               interp_type=p.interpolation)
                                 out_var[key][ind_time[0], :] = _ssh
                                 if key == 'ssh_true':
-                                    out_var['mask_land'][numpy.isnan(_ssh)] = 3
+                                    # FlG
+                                    #out_var['mask_land'][numpy.isnan(_ssh)] = 3
+                                    out_var['mask_land'][ind_time[0], :][numpy.isnan(_ssh)] = 3
                         if compute_nadir is True:
+                            # FlG
                             lon_ngrid = wrap_lon(lon_ngrid)
-                            ngrid_def = geomdef(lons=lon_ngrid, lats=ngrid.lat)
+                            #ngrid_def = geomdef(lons=lon_ngrid, lats=ngrid.lat)
+                            ngrid_def = geomdef(lons=lon_ngrid[ind_nadir_time[0]], lats=ngrid.lat[ind_nadir_time[0]])
                             for key in input_var.keys():
                                 _ssh = interp(swath_def, input_var[key],
                                               ngrid_def,
@@ -427,7 +435,9 @@ def create_SWOTlikedata(cycle, list_file, modelbox, sgrid, ngrid,
                                               sgrid.lat[ind_time[0], :]),
                                               method=p.interpolation)
                                 if key == 'ssh_true':
-                                    out_var['mask_land'][numpy.isnan(_ssh)] = 3
+                                    # FlG
+                                    #out_var['mask_land'][numpy.isnan(_ssh)] = 3
+                                    out_var['mask_land'][ind_time[0], :][numpy.isnan(_ssh)] = 3
                                 out_var[key][ind_time[0], :] = _ssh
                         if compute_nadir is True:
                             for key in input_var.keys():

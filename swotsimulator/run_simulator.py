@@ -168,7 +168,8 @@ def run_simulator(p, die_on_error=False, nadir_alone=False):
     # Build model time steps from parameter file
     modeltime = numpy.arange(0, p.nstep*p.timestep, p.timestep)
     #   Remove the grid from the list of model files
-    if p.file_input and p.file_grid_model is None:
+    # FlG: if p.file_input and p.file_grid_model is None:
+    if p.file_input is None and p.file_grid_model is None:
         logger.info("WARNING: the first file is not used to build data")
         list_file.remove(list_file[0])
         if len(modeltime) > len(list_file):
@@ -223,7 +224,7 @@ def err_formatter(pid, grid, cycle, exc):
     if cycle < 0:
         msg = '/!\ Error occurred while processing grid {}'.format(grid)
     else:
-        _msg = '/!\ Error occurred while processing cycle {} on grid {}'
+        _msg = '/!\ Error occurred while processing cycle {} on grid {}'
         msg = _msg.format(cycle, grid)
     return msg
 
